@@ -1,0 +1,6 @@
+-r requirements.txt
+beautifulsoup4>=4.12
+httpx>=0.28
+lxml>=5
+pytest>=9
+ruff>=0.17

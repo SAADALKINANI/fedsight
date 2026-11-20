@@ -1,0 +1,17 @@
+[project]
+name = "fedsight"
+version = "1.0.0"
+description = "Cited question answering over GAO reports, FEMA guidance and CDC data, with evaluation and guardrails."
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 120
+extend-exclude = [".cache", ".index"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
