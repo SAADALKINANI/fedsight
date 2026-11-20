@@ -3,7 +3,9 @@
 Ask questions about GAO reports, FEMA regulations and CDC data, and get short answers where every sentence links
 to the exact passage or table row it came from.
 
-**Live demo:** deploying to Google Cloud Run now; the link goes here once it's up.
+**Live demo:** https://fedsight-864216606737.us-east4.run.app  ·  **API docs:** [/docs](https://fedsight-864216606737.us-east4.run.app/docs)
+
+![FedSight answering a question about Florida's disaster declarations, with the SQL query and result rows as the cited source](docs/screenshot-answer.jpg)
 
 I built this to see how far a retrieval-augmented app can go on the thing federal work actually requires: answers
 you can check. It's a small system, but it has the parts I'd want in a bigger one: hybrid search, a SQL tool for
