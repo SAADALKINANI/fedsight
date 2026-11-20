@@ -1,0 +1,6 @@
+{
+  "embed_model": "snowflake/snowflake-arctic-embed-xs",
+  "passages": 8768,
+  "dim": 384,
+  "chunks_sha": "abcf8f03b0e9c3d3"
+}
