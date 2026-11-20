@@ -1,5 +1,31 @@
-# Deploying FedSight to Google Cloud Run
+# Deploying FedSight
 
+Two ways to run it in public. The first is free and needs no credit card, which is what the live demo uses.
+The second is the production-style option.
+
+## Option 1: Hugging Face Spaces (free)
+
+A Docker Space gives you 2 CPUs and 16 GB of memory at no cost, builds the Dockerfile on its own servers,
+and sleeps after a couple of idle days (the first visit after that waits about a minute for it to wake).
+
+1. Make a free account at huggingface.co and create a token with **write** access
+   (Settings > Access Tokens).
+2. From the repo root:
+
+```bash
+pip install huggingface_hub
+export HF_TOKEN=hf_...                  # the token from step 1
+export ANTHROPIC_API_KEY=sk-ant-...     # a key made just for this deployment
+python scripts/deploy_hf.py --space YOUR_HF_USERNAME/fedsight
+```
+
+The script creates the Space, stores the API key as a Space secret (it is never in the repo or the image),
+sets the rate limits, uploads the files the Dockerfile needs, and waits for the build. The live app is at
+`https://YOUR_HF_USERNAME-fedsight.hf.space`. Build output is under the Space's **Logs** tab.
+
+To redeploy after a change, run the same command again.
+
+## Option 2: Google Cloud Run
 Cloud Run bills per request and scales to zero, so a portfolio demo that gets a handful of visits a day
 costs close to nothing. The only real cost is the Anthropic API, and the app caps that (see below).
 
