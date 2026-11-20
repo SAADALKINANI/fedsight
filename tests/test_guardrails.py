@@ -93,3 +93,19 @@ def test_citation_spanning_adjacent_blocks_is_valid():
 def test_empty_citation_text_is_invalid():
     rep = check_answer([seg("Florida had two declarations in September 2017 (4337 and 4341).", "")], SOURCE)
     assert rep.citations_invalid == 1
+
+
+def test_misplaced_thousands_separator_is_flagged():
+    # digits match the source once commas are removed, but "21,298230,083.89" is still a typo
+    seg = [{"text": "The next largest obligation is $21,298230,083.89 for disaster 4340 in the data.",
+            "citations": [{"cited_text": "total_obligated_amount_pa = 21298230083.89"}]}]
+    rep = check_answer(seg, ["total_obligated_amount_pa = 21298230083.89"])
+    assert rep.status == "partially_supported"
+    assert any(n.startswith("malformed:") for n in rep.unsupported_numbers)
+
+
+def test_commas_after_numbers_are_not_mistaken_for_separators():
+    text = "Between 2008, 2009 and 2010, FEMA granted 1,234 of 2,000 requests, 57 percent."
+    seg = [{"text": text, "citations": [{"cited_text": text}]}]
+    rep = check_answer(seg, [text])
+    assert rep.status == "verified" and not rep.unsupported_numbers

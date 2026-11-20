@@ -77,9 +77,20 @@ def _squash(s: str) -> str:
     return re.sub(r"\s+", "", s).lower()
 
 
+def _malformed(m: str) -> bool:
+    """A figure like 21,298230,083.89 is a typo even though its digits match the source once the commas
+    are stripped, so thousands groups have to be exactly three digits."""
+    whole = m.rstrip(",").lstrip("$").split(".")[0].rstrip("%")
+    parts = whole.split(",")
+    return len(parts) > 1 and (not 1 <= len(parts[0]) <= 3 or any(len(p) != 3 for p in parts[1:]))
+
+
 def _numbers(text: str) -> set[str]:
     out = set()
     for m in NUM_RE.findall(text):
+        if _malformed(m):
+            out.add("malformed:" + m.rstrip(","))
+            continue
         n = m.replace("$", "").replace(",", "").rstrip("%").rstrip(".")
         if n and not (len(n) == 1 and n.isdigit()):  # single digits ("3 recommendations") are too noisy to check
             out.add(n)
