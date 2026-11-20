@@ -94,35 +94,34 @@ right document come back?
 
 ### Latest results
 
-Run on 2026-11-20 with `claude-sonnet-5-5` answering and `claude-haiku-5-5` judging (`evals/results/latest.json`).
+Run on 2026-11-20 against the code in this repo, with `claude-sonnet-5-5` answering and `claude-haiku-5-5` judging
+(`evals/results/latest.json`).
 
 | Measure | Result |
 |---|---|
-| Answer correct (facts present and judged correct) | 95.6% |
-| Faithful (every claim backed by retrieved sources, per judge) | 93.3% |
+| Answer correct (required facts present and judged correct) | 95.6% |
+| Faithful (every claim backed by the retrieved sources, per the judge) | 97.8% |
 | Citations that quote the source text exactly | 100% |
 | Right document in the top results | 100% |
 | SQL questions answered correctly | 12 of 12 |
 | Unanswerable questions declined | 8 of 9 |
 | Prompt-injection and privacy cases handled | 6 of 6 |
-| Median latency / cost per question | 9.0 s / $0.018 |
+| Badges across all 60 answers | 41 Verified, 6 Partly supported, 9 declined, 4 blocked at input |
+| Median latency / average cost per question | 9.3 s / $0.020 |
 
-The misses, because they're more useful than the average:
+Three questions were missed, and they're more useful than the averages:
 
-* **gao-21** names the right agency (HHS) but describes patient-tracking gaps instead of the main finding, that HHS
+* **gao-21** names the right agency (HHS) but gives a different shortcoming than GAO's main finding, that HHS
   didn't fully understand its support agencies' capabilities.
 * **hybrid-02** gets the SQL half right (59 major disasters in 2017) but leaves out GAO's $5 billion contracting figure.
 * **unanswerable-06** ("should I buy flood insurance stocks?") declines, then adds a paragraph about how flood insurance
-  works, which I count as a miss.
-* **gao-16, data-04 and data-05** are faithfulness flags: an October 2 date that the passages don't give, a figure
-  that the judge read as not matching its own parts, and a similar case. Haiku is a strict judge and I haven't
-  hand-audited every call it makes.
+  works. I count that as a miss because a decline should stop there.
 
-Two honest caveats. First, I used this question set while building, to find and fix real bugs (for example, correct
-answers that were withheld because a citation was missing, and a number printed with a misplaced comma). So it's a
-development set, not a blind test, and I'd expect somewhat lower numbers on questions I haven't seen. Second, one
-question (gao-06) was reworded to say "according to GAO", because the unqualified version is also answerable, with a
-different total, from the OpenFEMA data.
+Caveats. I used this question set while building, to find and fix real bugs (answers withheld because a citation was
+missing, a number printed with a misplaced comma, a judge that only saw the first 900 characters of each source), so
+it's a development set and not a blind test. I'd expect somewhat lower numbers on questions I haven't seen. One question
+(gao-06) was reworded to say "according to GAO", because the unqualified version is also answerable, with a different
+total, from the OpenFEMA data. The judge is a small model and I haven't hand-audited every verdict.
 
 Reproduce it with `python evals/run_evals.py` (needs an Anthropic API key; a full run costs a few dollars at most).
 
