@@ -53,7 +53,7 @@ Reply with only JSON: {{"correct": true|false, "faithful": true|false, "reason":
 
 
 def judge(client, q: dict, result: dict) -> dict:
-    sources = "\n".join(f"- {s['title']}: {s['text'][:900]}" for s in result["sources"][:10]) or "(none)"
+    sources = "\n".join(f"- {s['title']}: {s['text'][:3000]}" for s in result["sources"][:12]) or "(none)"
     resp = client.messages.create(
         model=settings.judge_model, max_tokens=1500,
         messages=[{"role": "user", "content": JUDGE_PROMPT.format(
@@ -108,7 +108,7 @@ def main() -> int:
                     picked.append(by_cat[cat].pop(0))
         questions = picked
 
-    client = anthropic.Anthropic(max_retries=3, timeout=90)
+    client = anthropic.Anthropic(max_retries=3, timeout=60)
     agent = Agent(client, load_index(), ReadOnlyDB())
     print(f"running {len(questions)} questions with {settings.answer_model} ...", flush=True)
 
