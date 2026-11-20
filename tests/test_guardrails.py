@@ -109,3 +109,18 @@ def test_commas_after_numbers_are_not_mistaken_for_separators():
     seg = [{"text": text, "citations": [{"cited_text": text}]}]
     rep = check_answer(seg, [text])
     assert rep.status == "verified" and not rep.unsupported_numbers
+
+
+def test_report_numbers_in_a_source_title_count_as_grounded():
+    text = "Home repair rules are in 44 CFR 206.113, which covers housing assistance eligibility."
+    seg = [{"text": text, "citations": [{"cited_text": "Housing assistance covers repair of the primary residence."}]}]
+    texts = ["Housing assistance covers repair of the primary residence."]
+    assert check_answer(seg, texts).unsupported_numbers
+    assert not check_answer(seg, texts, ["44 CFR 206.113 - Housing assistance"]).unsupported_numbers
+
+
+def test_whole_numbers_printed_with_a_decimal_point_still_match():
+    seg = [{"text": "Maryland recorded 2,523 overdose deaths in the 12 months ending December 2022.",
+            "citations": [{"cited_text": "reported_value = 2523.0"}]}]
+    rep = check_answer(seg, ["reported_value = 2523.0; period_end = 2022-12"])
+    assert not rep.unsupported_numbers

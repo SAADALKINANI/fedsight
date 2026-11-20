@@ -92,6 +92,7 @@ def _numbers(text: str) -> set[str]:
             out.add("malformed:" + m.rstrip(","))
             continue
         n = m.replace("$", "").replace(",", "").rstrip("%").rstrip(".")
+        n = re.sub(r"\.0+$", "", n)  # SQL prints 2523.0 where an answer says 2,523
         if n and not (len(n) == 1 and n.isdigit()):  # single digits ("3 recommendations") are too noisy to check
             out.add(n)
     return out
@@ -126,15 +127,16 @@ DECLINE_RE = re.compile(r"(couldn'?t|could not|can'?t|cannot|unable to) find|not
                         r"|outside (the scope|what)|don'?t have (a source|information)", re.I)
 
 
-def check_answer(segments: list[dict], source_texts: list[str]) -> OutputReport:
+def check_answer(segments: list[dict], source_texts: list[str], titles: list[str] | None = None) -> OutputReport:
     """segments: [{"text": str, "citations": [{"cited_text": str, ...}]}]
-    source_texts: every text block that was given to the model (passages and query results)."""
+    source_texts: every text block that was given to the model (passages and query results).
+    titles: the source titles, which carry report numbers and CFR sections an answer may name."""
     rep = OutputReport()
     full = "".join(s["text"] for s in segments)
     rep.declined = bool(DECLINE_RE.search(full)) and sum(len(s.get("citations", [])) for s in segments) == 0
     corpus = _norm(" ".join(source_texts))
     corpus_squashed = _squash(corpus)
-    corpus_nums = _numbers(corpus)
+    corpus_nums = _numbers(corpus) | _numbers(" ".join(titles or []))
 
     cited_chars = total_chars = 0
     for seg in segments:
