@@ -80,3 +80,16 @@ def test_pii_in_answer_is_reported():
     rep = check_answer([seg("Contact the analyst at jane.doe@agency.gov for details on staffing.",
                             "GAO recommended a workforce strategy.")], SOURCE)
     assert rep.pii_found == ["email"]
+
+
+def test_citation_spanning_adjacent_blocks_is_valid():
+    # the API glues the text of neighbouring cited blocks together without a separator
+    blocks = ["disaster_number = 4337; declaration_date = 2017-09-10", "disaster_number = 4341; declaration_date = 2017-09-27"]
+    glued = blocks[0] + blocks[1]
+    rep = check_answer([seg("Florida had two declarations in September 2017 (4337 and 4341).", glued)], blocks)
+    assert rep.citations_invalid == 0 and rep.status == "verified"
+
+
+def test_empty_citation_text_is_invalid():
+    rep = check_answer([seg("Florida had two declarations in September 2017 (4337 and 4341).", "")], SOURCE)
+    assert rep.citations_invalid == 1

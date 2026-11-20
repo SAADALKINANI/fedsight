@@ -71,6 +71,12 @@ def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", s).strip().lower()
 
 
+def _squash(s: str) -> str:
+    """Lowercase with all whitespace removed. When Claude cites two neighbouring blocks, the API returns their
+    text glued together with no separator, so a citation is compared to the sources ignoring whitespace."""
+    return re.sub(r"\s+", "", s).lower()
+
+
 def _numbers(text: str) -> set[str]:
     out = set()
     for m in NUM_RE.findall(text):
@@ -116,6 +122,7 @@ def check_answer(segments: list[dict], source_texts: list[str]) -> OutputReport:
     full = "".join(s["text"] for s in segments)
     rep.declined = bool(DECLINE_RE.search(full)) and sum(len(s.get("citations", [])) for s in segments) == 0
     corpus = _norm(" ".join(source_texts))
+    corpus_squashed = _squash(corpus)
     corpus_nums = _numbers(corpus)
 
     cited_chars = total_chars = 0
@@ -128,7 +135,8 @@ def check_answer(segments: list[dict], source_texts: list[str]) -> OutputReport:
                 cited_chars += len(text)
         for c in cites:
             rep.citations_total += 1
-            if _norm(c.get("cited_text", "")) not in corpus:
+            cited = _squash(c.get("cited_text", ""))
+            if not cited or cited not in corpus_squashed:
                 rep.citations_invalid += 1
         if substantive:
             evidence = " ".join(c.get("cited_text", "") for c in cites) or ""
