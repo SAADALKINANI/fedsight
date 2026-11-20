@@ -114,7 +114,21 @@ def test_uncited_answer_gets_one_chance_to_cite(agent_factory):
     res = agent.ask("How many disasters has Florida had?")
     assert res.guardrails["status"] == "verified" and res.usage["llm_calls"] == 3
     asked = client.requests[2]["messages"][-1]["content"]
-    assert "citing" in asked
+    assert "citation" in asked
+
+
+def test_answer_that_cites_only_its_last_sentence_is_asked_again(agent_factory):
+    half = {"content": [
+        {"type": "text", "text": "Florida has had 2 declared disasters in the data, counting each disaster once. "},
+        {"type": "text", "text": "That count comes from the declarations table.",
+         "citations": [{"type": "search_result_location", "source": FL_SOURCE, "title": "t", "cited_text": "n = 2"}]},
+    ], "usage": usage()}
+    agent, _ = agent_factory(
+        tool_call("query_data", sql=FL_SQL), half,
+        answer("Florida has had 2 declared disasters in the data, counting each disaster once.", FL_SOURCE, "n = 2"),
+    )
+    res = agent.ask("How many disasters has Florida had?")
+    assert res.guardrails["status"] == "verified" and res.usage["llm_calls"] == 3
 
 
 def test_still_uncited_after_the_retry_is_withheld(agent_factory):

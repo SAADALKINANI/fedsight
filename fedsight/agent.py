@@ -254,14 +254,13 @@ class Agent:
                                      "query_data first, then answer only from what they return."})
                     continue
                 if (steps and given and not cite_retried and i < settings.max_agent_steps - 1
-                        and not any(b.get("citations") for b in content if b["type"] == "text")
-                        and not _declines(content)):
-                    # Occasionally the model answers a one-number query without citing it. Ask once for citations
-                    # instead of throwing away a correct answer.
+                        and not _declines(content) and self._thinly_cited(content, given)):
+                    # Occasionally the model answers without citing, or cites only the last sentence. Ask once
+                    # for citations on every claim instead of throwing away a correct answer.
                     cite_retried = True
                     messages.append({"role": "assistant", "content": _assistant_content(content)})
-                    messages.append({"role": "user", "content": "Give that answer again, citing the search "
-                                     "results or query rows that support each claim."})
+                    messages.append({"role": "user", "content": "Give that answer again, with a citation to the "
+                                     "search results or query rows on every sentence that states a fact."})
                     continue
                 final = content
                 break
@@ -280,7 +279,7 @@ class Agent:
 
         segments, cited = self._segments(final)
         source_texts = [c["text"] for g in given for c in g["block"]["content"]]
-        report = check_answer(segments, source_texts)
+        report = check_answer(segments, source_texts, [g["block"]["title"] for g in given])
         if report.status == "unsupported" and not report.declined:
             segments = [{"text": "I couldn't build a sourced answer to that from the indexed documents and data, "
                                  "so I'm not going to guess. Try rephrasing or narrowing the question.", "citations": []}]
@@ -289,6 +288,12 @@ class Agent:
         usage["cost_usd"] = round(cost_usd(self.model, usage["input_tokens"], usage["output_tokens"]), 5)
         return AgentResult(rid, clean, segments, self._sources(given, cited), steps,
                            base_guard | report.as_dict() | {"checked_numbers": True}, usage)
+
+    def _thinly_cited(self, content: list[dict], given: list[dict]) -> bool:
+        segments, _ = self._segments(content)
+        texts = [c["text"] for g in given for c in g["block"]["content"]]
+        report = check_answer(segments, texts, [g["block"]["title"] for g in given])
+        return report.citations_total == 0 or report.coverage < 0.6
 
     @staticmethod
     def _segments(content: list[dict]) -> tuple[list[dict], dict[str, int]]:
