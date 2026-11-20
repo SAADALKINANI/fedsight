@@ -1,35 +1,13 @@
 # Deploying FedSight
 
-Two ways to run it in public. The first is free and needs no credit card, which is what the live demo uses.
-The second is the production-style option.
+Two ways to run it in public. Cloud Run is the production-style option and is what the live demo uses.
+Hugging Face Spaces is a free alternative that needs no credit card.
 
-## Option 1: Hugging Face Spaces (free)
-
-A Docker Space gives you 2 CPUs and 16 GB of memory at no cost, builds the Dockerfile on its own servers,
-and sleeps after a couple of idle days (the first visit after that waits about a minute for it to wake).
-
-1. Make a free account at huggingface.co and create a token with **write** access
-   (Settings > Access Tokens).
-2. From the repo root:
-
-```bash
-pip install huggingface_hub
-export HF_TOKEN=hf_...                  # the token from step 1
-export ANTHROPIC_API_KEY=sk-ant-...     # a key made just for this deployment
-python scripts/deploy_hf.py --space YOUR_HF_USERNAME/fedsight
-```
-
-The script creates the Space, stores the API key as a Space secret (it is never in the repo or the image),
-sets the rate limits, uploads the files the Dockerfile needs, and waits for the build. The live app is at
-`https://YOUR_HF_USERNAME-fedsight.hf.space`. Build output is under the Space's **Logs** tab.
-
-To redeploy after a change, run the same command again.
-
-## Option 2: Google Cloud Run
+## Option 1: Google Cloud Run
 Cloud Run bills per request and scales to zero, so a portfolio demo that gets a handful of visits a day
 costs close to nothing. The only real cost is the Anthropic API, and the app caps that (see below).
 
-## One-time setup
+### One-time setup
 
 ```bash
 # 1. pick a project that has billing turned on
@@ -49,7 +27,7 @@ gcloud secrets add-iam-policy-binding anthropic-api-key \
     --role=roles/secretmanager.secretAccessor
 ```
 
-## Deploy
+### Deploy
 
 From the repo root:
 
@@ -75,22 +53,44 @@ The command prints the service URL. Check it:
 curl https://YOUR-SERVICE-URL/api/health
 ```
 
-## Cost controls
+### Cost controls
 
 * `FEDSIGHT_RATE_LIMIT` limits questions per visitor per hour; `FEDSIGHT_DAILY_CAP` limits total questions per day.
-  At roughly 3 cents a question, a 200-question day tops out around $6.
+  At about 2 cents a question (the eval run averaged $0.018), a 200-question day tops out around $4.
 * `--max-instances 2` bounds compute.
 * Set a monthly budget alert on the project (Billing > Budgets) and a spend limit on the Anthropic key.
 * The rate limiter is in memory, so each Cloud Run instance counts separately. That's fine for a demo;
   a production service would move it to Redis or Memorystore.
 
-## Updating
+### Updating
 
 Re-run the same `gcloud run deploy` command. To rotate the key, add a new secret version and redeploy.
 
-## Tearing it down
+### Tearing it down
 
 ```bash
 gcloud run services delete fedsight --region us-east4
 gcloud secrets delete anthropic-api-key
 ```
+
+## Option 2: Hugging Face Spaces (free, no card)
+
+A Docker Space gives you 2 CPUs and 16 GB of memory at no cost, builds the Dockerfile on its own servers,
+and sleeps after a couple of idle days (the first visit after that waits about a minute for it to wake).
+
+1. Make a free account at huggingface.co and create a token with **write** access
+   (Settings > Access Tokens).
+2. From the repo root:
+
+```bash
+pip install huggingface_hub
+export HF_TOKEN=hf_...                  # the token from step 1
+export ANTHROPIC_API_KEY=sk-ant-...     # a key made just for this deployment
+python scripts/deploy_hf.py --space YOUR_HF_USERNAME/fedsight
+```
+
+The script creates the Space, stores the API key as a Space secret (it is never in the repo or the image),
+sets the rate limits, uploads the files the Dockerfile needs, and waits for the build. The live app is at
+`https://YOUR_HF_USERNAME-fedsight.hf.space`. Build output is under the Space's **Logs** tab.
+
+To redeploy after a change, run the same command again.
