@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FedSight · cited answers from GAO, FEMA and CDC</title>
+  <meta name="description" content="Ask questions across GAO reports, FEMA guidance and CDC data. Every answer is cited and checked.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="/">FedSight</a>
+      <nav>
+        <button class="tab active" data-view="ask">Ask</button>
+        <button class="tab" data-view="evals">Evaluation</button>
+        <button class="tab" data-view="about">About</button>
+        <a class="tab" href="/docs" target="_blank" rel="noopener">API</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="view-ask" class="view">
+      <div class="hero">
+        <h1>Ask the federal record.</h1>
+        <p>Answers drawn from GAO reports, FEMA program guides and CDC data. Every sentence links to the page or table row it came from.</p>
+      </div>
+
+      <form id="ask-form" class="ask">
+        <textarea id="q" rows="2" maxlength="600" placeholder="e.g. What did GAO find about FEMA's disaster workforce?" required></textarea>
+        <div class="ask-row">
+          <div class="chips" id="source-chips">
+            <span class="chips-label">Search</span>
+            <button type="button" class="chip on" data-source="all">All sources</button>
+            <button type="button" class="chip" data-source="gao">GAO</button>
+            <button type="button" class="chip" data-source="fema">FEMA</button>
+            <button type="button" class="chip" data-source="cdc">CDC</button>
+          </div>
+          <button id="ask-btn" class="primary" type="submit">Ask</button>
+        </div>
+      </form>
+
+      <div id="examples" class="examples"></div>
+
+      <div id="status" class="status hidden"></div>
+
+      <article id="result" class="hidden">
+        <div class="answer-card">
+          <div class="answer-head">
+            <span id="badge" class="badge"></span>
+            <span id="meta" class="meta"></span>
+          </div>
+          <div id="answer" class="answer"></div>
+        </div>
+
+        <h2 class="section-title">Sources</h2>
+        <ol id="sources" class="sources"></ol>
+
+        <details class="trace">
+          <summary>How this answer was produced</summary>
+          <div class="trace-grid">
+            <div>
+              <h3>Steps</h3>
+              <ol id="steps" class="steps"></ol>
+            </div>
+            <div>
+              <h3>Checks</h3>
+              <ul id="checks" class="checks"></ul>
+            </div>
+          </div>
+        </details>
+      </article>
+    </section>
+
+    <section id="view-evals" class="view hidden">
+      <h1 class="page-title">Evaluation</h1>
+      <p class="lede">The app is tested against a fixed set of questions with known answers before every release. These are the numbers from the latest run.</p>
+      <div id="evals-body" class="evals-body">Loading…</div>
+    </section>
+
+    <section id="view-about" class="view hidden">
+      <h1 class="page-title">About</h1>
+      <div class="about">
+        <p>FedSight is a retrieval-augmented assistant for people who work with federal oversight and emergency-management data. It answers questions from three kinds of public sources:</p>
+        <ul>
+          <li><strong>GAO reports</strong> on disaster response, public health and federal programs.</li>
+          <li><strong>FEMA guidance</strong>, including the Individual Assistance and Public Assistance program and policy guides, plus OpenFEMA declarations and disaster totals.</li>
+          <li><strong>CDC data</strong> on provisional drug overdose deaths by state.</li>
+        </ul>
+        <h3>What keeps it honest</h3>
+        <ul>
+          <li>It has to search before it answers, and it only answers from what the search returned.</li>
+          <li>Claude's citation feature ties each sentence to a passage or a row of query results. The server then checks every cited quote against the source text and every number against the evidence.</li>
+          <li>If it can't support an answer, it says so instead of guessing.</li>
+          <li>Personal information in questions is redacted before it reaches the model or the logs, obvious prompt-injection attempts are refused, and text inside documents is treated as data, never as instructions.</li>
+          <li>Data questions run as read-only SQL against an allow-listed set of tables.</li>
+        </ul>
+        <p class="fine">Not legal, medical or financial advice. Source documents are public U.S. government works. Built by Saad Alkinani.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <span>FedSight · Claude API · Chroma · FastAPI · Cloud Run</span>
+    <a href="https://github.com/SAADALKINANI/fedsight" target="_blank" rel="noopener">Source on GitHub</a>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
