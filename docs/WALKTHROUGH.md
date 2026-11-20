@@ -54,8 +54,16 @@ confident wrong number. SQL gives an exact answer and an inspectable query. The 
 tool allows a single SELECT, uses a SQLite authorizer and `query_only`, returns at most 50 rows and has a time
 budget. The tests try DROP, INSERT, ATTACH, PRAGMA and a runaway recursive query.
 
-**Why force a tool call before answering.** `tool_choice: any` on the first step means the model can't answer from
-memory. On the last step I switch to `tool_choice: none` so it must answer with what it has rather than looping.
+**Why make it look something up before answering.** Without this the model sometimes answers from memory, and nothing
+it says could be backed by a source. My first plan was `tool_choice: any`, which forces a tool call. Claude Sonnet 5.5
+rejects that setting (the API returns a 400; only `auto` and `none` work), so the code enforces it instead: if the model
+answers without calling a tool it is sent back once, and if it still hasn't looked anything up the answer is a decline.
+On the last step I use `tool_choice: none` so it answers with what it has rather than looping. This is a good example
+of a design choice I had to change because the platform changed under me.
+
+**Why it asks for citations a second time.** Occasionally the model answers correctly but cites only one sentence, or
+none. Rather than throw away a correct answer or show a misleading badge, the agent asks once for a citation on every
+sentence that states a fact. It costs one extra call in a minority of questions.
 
 **Why layered guardrails.** No single control is reliable, so there are several that fail differently:
 1. Input: PII is redacted before the model or the logs see it; regex screening catches obvious injection and the
@@ -98,7 +106,7 @@ search and reranker to cover the difference.
 
 ## Questions I expect, and short answers
 
-**How do you know it doesn't hallucinate?** I don't claim it can't. I reduced the ways it can: forced retrieval, citations
+**How do you know it doesn't hallucinate?** I don't claim it can't. I reduced the ways it can: required retrieval, citations
 returned by the API, my own verification of every quote and number, and a decline path. Then I measure it. The
 evaluation tab shows the current numbers, including the misses.
 
