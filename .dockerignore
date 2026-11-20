@@ -1,0 +1,9 @@
+.git
+.cache
+.index
+.env
+tests
+scripts
+docs
+__pycache__
+*.pyc
