@@ -72,3 +72,11 @@ def test_summary_rates_and_categories():
     assert s["answer_correct"] == 0.5 and s["retrieval_hit_at_k"] == 0.5
     assert s["by_category"]["gao"] == {"n": 2, "passed": 1}
     assert s["latency_p50_s"] == 4.0
+
+
+def test_decline_with_a_short_pointer_counts_as_declined():
+    u = {"id": "u", "category": "unanswerable", "expect": "decline", "must_include": [], "expected_docs": [], "forbidden": []}
+    text = "I couldn't find this in the indexed sources. They only cover GAO reports through mid-2020."
+    assert score_row(u, fake_result(text, status="partially_supported"), None)["declined_when_unanswerable"]
+    sneaky = "FEMA's budget is $15 billion. I couldn't find the 2030 figure in the indexed sources."
+    assert not score_row(u, fake_result(sneaky, status="partially_supported"), None)["declined_when_unanswerable"]

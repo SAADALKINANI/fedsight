@@ -17,7 +17,7 @@ import re
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -55,10 +55,11 @@ Reply with only JSON: {{"correct": true|false, "faithful": true|false, "reason":
 def judge(client, q: dict, result: dict) -> dict:
     sources = "\n".join(f"- {s['title']}: {s['text'][:900]}" for s in result["sources"][:10]) or "(none)"
     resp = client.messages.create(
-        model=settings.judge_model, max_tokens=300,
+        model=settings.judge_model, max_tokens=1500,
         messages=[{"role": "user", "content": JUDGE_PROMPT.format(
             question=q["question"], reference=q["reference"], answer=result["answer"], sources=sources)}])
-    text = resp.content[0].text
+    # newer models can start with thinking blocks, so read the text blocks by type
+    text = "".join(b.text for b in resp.content if b.type == "text")
     match = re.search(r"\{.*\}", text, re.S)
     data = json.loads(match.group()) if match else {}
     judge_cost = cost_usd(settings.judge_model, resp.usage.input_tokens, resp.usage.output_tokens)
@@ -126,7 +127,7 @@ def main() -> int:
     scored = [r for r in rows if "error" not in r]
     summary = summarize(scored)
     summary |= {
-        "run_at": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "run_at": datetime.now(UTC).strftime("%Y-%m-%d"),
         "answer_model": settings.answer_model, "judge_model": settings.judge_model,
         "errors": len(errors), "judge_cost_total": round(sum(r.get("judge_cost_usd", 0) for r in scored), 4),
         "wall_seconds": round(time.time() - started),

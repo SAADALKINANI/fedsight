@@ -79,7 +79,7 @@
  {
   "id": "gao-06",
   "category": "gao",
-  "question": "How much support did FEMA provide for wildfire-related major disaster declarations from 2015 through 2018?",
+  "question": "According to GAO, how much support did FEMA provide for wildfire-related major disaster declarations from 2015 through 2018?",
   "expect": "answer",
   "reference": "Over $2.4 billion.",
   "expected_docs": [
@@ -637,12 +637,12 @@
   "category": "hybrid",
   "question": "GAO's drug misuse report says over 67,000 people died of an overdose in 2018. How many US overdose deaths did CDC record in the 12 months ending December 2024?",
   "expect": "answer",
-  "reference": "GAO-20-474 cites over 67,000 for 2018; CDC data show 80,860 for the 12 months ending December 2024.",
+  "reference": "GAO-20-474 cites over 67,000 (67,367) overdose deaths for 2018; CDC data show 80,860 for the 12 months ending December 2024.",
   "expected_docs": [
    "GAO-20-474"
   ],
   "must_include": [
-   "67,000",
+   "67,367|67,000",
    "80,860"
   ],
   "expected_tool": "query_data",
