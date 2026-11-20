@@ -35,6 +35,26 @@ TABLES = {
     ),
 }
 
+# One plain sentence per table saying what the data is. It is attached to every query result as a
+# citable text block, so labels like "provisional" or "Public Assistance" in an answer have a source.
+PROVENANCE = {
+    "fema_declarations": (
+        "Dataset: OpenFEMA Disaster Declarations Summaries. It has one row per designated county or tribe, so a "
+        "disaster is counted once by its disaster_number. declaration_type DR means major disaster, EM means "
+        "emergency and FM means fire management assistance."
+    ),
+    "fema_disaster_totals": (
+        "Dataset: OpenFEMA disaster totals. IHP is the Individuals and Households Program and PA is Public "
+        "Assistance (categories A and B are emergency work, categories C through G are permanent work). "
+        "HMGP is the Hazard Mitigation Grant Program. Amounts are US dollars."
+    ),
+    "cdc_overdose_deaths": (
+        "Dataset: CDC provisional drug overdose death counts. Each value is a count for the 12 months ending in "
+        "period_end. The counts are provisional. predicted_value adjusts reported_value for reporting delays. "
+        "State 'US' is the national total and 'YC' is New York City, which is reported separately from New York State."
+    ),
+}
+
 MAX_ROWS = 50
 _ALLOWED_START = re.compile(r"^\s*(select|with)\b", re.I)
 
