@@ -2,7 +2,8 @@ FROM python:3.13-slim
 
 ENV PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    FASTEMBED_CACHE_PATH=/models
+    FASTEMBED_CACHE_PATH=/models \
+    FEDSIGHT_INDEX_DIR=/tmp/index
 
 # Hugging Face Spaces runs containers as user 1000, so run as that user everywhere.
 RUN useradd -m -u 1000 user && mkdir /models && chown user /models
