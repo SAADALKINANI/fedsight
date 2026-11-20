@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>FedSight · cited answers from GAO, FEMA and CDC</title>
-  <meta name="description" content="Ask questions across GAO reports, FEMA guidance and CDC data. Every answer is cited and checked.">
+  <meta name="description" content="Ask questions across GAO reports, FEMA regulations and CDC data. Every answer is cited and checked.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
@@ -26,7 +26,7 @@
     <section id="view-ask" class="view">
       <div class="hero">
         <h1>Ask the federal record.</h1>
-        <p>Answers drawn from GAO reports, FEMA program guides and CDC data. Every sentence links to the page or table row it came from.</p>
+        <p>Answers drawn from GAO reports, FEMA regulations and CDC data. Every sentence links to the page or table row it came from.</p>
       </div>
 
       <form id="ask-form" class="ask">
@@ -86,9 +86,9 @@
       <div class="about">
         <p>FedSight is a retrieval-augmented assistant for people who work with federal oversight and emergency-management data. It answers questions from three kinds of public sources:</p>
         <ul>
-          <li><strong>GAO reports</strong> on disaster response, public health and federal programs.</li>
-          <li><strong>FEMA guidance</strong>, including the Individual Assistance and Public Assistance program and policy guides, plus OpenFEMA declarations and disaster totals.</li>
-          <li><strong>CDC data</strong> on provisional drug overdose deaths by state.</li>
+          <li><strong>GAO reports</strong> (87 reports from 2017 to 2020) on disaster response, public health, IT and cybersecurity, and program integrity.</li>
+          <li><strong>FEMA</strong>: the current disaster-assistance regulations (44 CFR parts 201, 204 and 206), OpenFEMA dataset documentation, and the declarations and disaster-totals datasets.</li>
+          <li><strong>CDC</strong>: overdose-prevention and preparedness web pages, plus provisional drug overdose death counts by state.</li>
         </ul>
         <h3>What keeps it honest</h3>
         <ul>
@@ -98,7 +98,7 @@
           <li>Personal information in questions is redacted before it reaches the model or the logs, obvious prompt-injection attempts are refused, and text inside documents is treated as data, never as instructions.</li>
           <li>Data questions run as read-only SQL against an allow-listed set of tables.</li>
         </ul>
-        <p class="fine">Not legal, medical or financial advice. Source documents are public U.S. government works. Built by Saad Alkinani.</p>
+        <p class="fine">GAO reports come from a public research dataset and stop at mid-2020, so questions about newer GAO work won't find an answer. FEMA and CDC sources are current. Not legal, medical or financial advice. Source documents are public U.S. government works. Built by Saad Alkinani.</p>
       </div>
     </section>
   </main>

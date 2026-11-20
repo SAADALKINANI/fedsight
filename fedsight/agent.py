@@ -17,7 +17,7 @@ from .search import HybridIndex, Passage
 from .tables import ReadOnlyDB
 
 SYSTEM_PROMPT = """You are FedSight, a research assistant for federal analysts. You answer questions using
-GAO reports, FEMA policy guides, CDC material, and structured OpenFEMA and CDC data.
+GAO reports, FEMA regulations and OpenFEMA documentation, CDC pages, and structured OpenFEMA and CDC data.
 
 How to work:
 - Always gather evidence with the tools before answering. Use search_documents for findings,
@@ -38,9 +38,9 @@ Today is {today}."""
 SEARCH_TOOL = {
     "name": "search_documents",
     "description": (
-        "Semantic + keyword search over GAO reports, FEMA program and policy guides, and CDC documents. "
-        "Returns the most relevant passages with page numbers. Write focused queries (an agency, program "
-        "or finding), not the user's whole question."
+        "Semantic + keyword search over GAO reports (2017-2020), FEMA regulations (44 CFR) and OpenFEMA dataset "
+        "documentation, and CDC web pages. Returns the most relevant passages with their section. Write focused "
+        "queries (an agency, program or finding), not the user's whole question."
     ),
     "input_schema": {
         "type": "object",

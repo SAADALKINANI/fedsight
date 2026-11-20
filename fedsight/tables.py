@@ -13,17 +13,25 @@ from .config import settings
 TABLES = {
     "fema_declarations": (
         "fema_declarations.csv.gz",
-        "One row per FEMA disaster declaration and designated area (county/tribe) since 1953. "
-        "Count distinct disaster_number to count disasters, not rows.",
+        "FEMA disaster declarations since 1953, one row per designated area (county or tribe), so count "
+        "DISTINCT disaster_number to count disasters. declaration_type: DR = major disaster, EM = emergency, "
+        "FM = fire management assistance. incident_type is a text label such as Hurricane or Fire; "
+        "declaration_date is YYYY-MM-DD and declaration_year is its year.",
     ),
     "fema_disaster_totals": (
         "fema_disaster_totals.csv.gz",
-        "One row per disaster with total dollars approved/obligated by program (Individual Assistance, "
-        "Public Assistance, Hazard Mitigation).",
+        "One row per disaster number with dollars approved or obligated: total_amount_ihp_approved "
+        "(Individuals and Households Program), total_obligated_amount_pa (Public Assistance), "
+        "total_obligated_amount_hmgp (Hazard Mitigation). Join to fema_declarations on disaster_number for "
+        "the state, title and date. Amounts are US dollars.",
     ),
     "cdc_overdose_deaths": (
         "cdc_overdose_deaths.csv.gz",
-        "CDC/NCHS provisional drug overdose death counts: 12-month ending totals by state, month and indicator.",
+        "CDC provisional drug overdose death counts. Each row is a 12-month-ending total: reported_value is the "
+        "count for the 12 months ending in period_end (YYYY-MM). state is a two-letter code; 'US' is the national "
+        "total and 'YC' is New York City, so don't add them to the states. indicator is e.g. "
+        "'Number of Drug Overdose Deaths' or 'Synthetic opioids, excl. methadone (T40.4)'. reported_value is empty "
+        "when CDC suppressed it (suppressed = 1).",
     ),
 }
 
